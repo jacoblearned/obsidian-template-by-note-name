@@ -1,17 +1,17 @@
 import { App, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
 
-// Remember to rename these classes and interfaces!
-
-interface NoteNameTemplaterSettings {
+interface TemplateByNoteNameSettings {
 	templateFolder: string;
+	templateOnRename: boolean;
 }
 
-const DEFAULT_SETTINGS: NoteNameTemplaterSettings = {
+const DEFAULT_SETTINGS: TemplateByNoteNameSettings = {
 	templateFolder: "Templates",
+	templateOnRename: false,
 };
 
-export default class NoteNameTemplaterPlugin extends Plugin {
-	settings: NoteNameTemplaterSettings;
+export default class TemplateByNoteNamePlugin extends Plugin {
+	settings: TemplateByNoteNameSettings;
 
 	async logFileContent(file: TFile) {
 		console.log(await this.app.vault.read(file));
@@ -40,7 +40,7 @@ export default class NoteNameTemplaterPlugin extends Plugin {
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new NoteNameTemplaterSettingTab(this.app, this));
+		this.addSettingTab(new TemplateByNoteNameSettingTab(this.app, this));
 	}
 
 	async loadSettings() {
@@ -57,10 +57,10 @@ export default class NoteNameTemplaterPlugin extends Plugin {
 	}
 }
 
-class NoteNameTemplaterSettingTab extends PluginSettingTab {
-	plugin: NoteNameTemplaterPlugin;
+class TemplateByNoteNameSettingTab extends PluginSettingTab {
+	plugin: TemplateByNoteNamePlugin;
 
-	constructor(app: App, plugin: NoteNameTemplaterPlugin) {
+	constructor(app: App, plugin: TemplateByNoteNamePlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

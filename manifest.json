@@ -1,9 +1,9 @@
 {
-	"id": "note-name-templater",
-	"name": "Note Name Templater",
+	"id": "tmeplate-by-note-name",
+	"name": "Template by Note Name",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "A simple Obsidian plugin that templates new notes based on their title.",
+	"description": "Automatically template new notes based on their title.",
 	"author": "Obsidian",
 	"authorUrl": "https://obsidian.md",
 	"fundingUrl": "https://obsidian.md/pricing",
