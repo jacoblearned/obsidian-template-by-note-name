@@ -1,9 +1,19 @@
 import { App, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
 
+class Matcher {
+	prefix: string;
+	templatePath: string;
+
+	constructor(prefix: string, template: string) {
+		this.prefix = prefix;
+		this.templatePath = template;
+	}
+}
+
 interface TemplateByNoteNameSettings {
 	templateFolder: string;
 	templateOnRename: boolean;
-	matchers: string[];
+	matchers: Matcher[];
 }
 
 const DEFAULT_SETTINGS: TemplateByNoteNameSettings = {
@@ -29,19 +39,34 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		this.app.workspace.onLayoutReady(() => {
 			this.registerEvent(
 				this.app.vault.on("create", async (file) => {
-					console.log("File created", file.path);
 					if (file instanceof TFile) {
-						await this.writeToFile(
-							file,
-							"Hello, world on layout ready!",
-						);
-						await this.logFileContent(file);
+						const templatePath = this.settings.matchers.find(
+							(matcher) =>
+								file.basename.startsWith(matcher.prefix),
+						)?.templatePath;
+
+						if (templatePath) {
+							const template =
+								this.app.vault.getFileByPath(templatePath);
+
+							if (!template) {
+								console.error(
+									`Template ${templatePath} not found`,
+								);
+								return;
+							}
+
+							const templateContent =
+								await this.app.vault.read(template);
+							await this.writeToFile(file, templateContent);
+						}
 					}
 				}),
 			);
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
+		// Adds tab for Template by Note Name under
+		// Settings -> Community plugins -> Template by Note Name
 		this.addSettingTab(new TemplateByNoteNameSettingTab(this.app, this));
 	}
 
@@ -89,49 +114,86 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 			.setName("Matchers")
 			.setHeading()
 			.addButton((text) =>
-				text.setButtonText("Create").onClick(async () => {
-					this.plugin.settings.matchers.push("Foo");
+				text.setButtonText("Add").onClick(async () => {
+					this.plugin.settings.matchers.push(new Matcher("", ""));
 					await this.plugin.saveSettings();
-					console.log("Matchers", this.plugin.settings.matchers);
 					this.display();
 				}),
 			);
 
+		// Ensure we have the empty matcher in order to display the help message
+		// in the first matcher element name and description.
+		if (this.plugin.settings.matchers.length === 0) {
+			this.plugin.settings.matchers.push(new Matcher("", ""));
+		}
+
 		this.plugin.settings.matchers.forEach((matcher, index) => {
-			new Setting(containerEl)
-				.setName(`Matcher ${index + 1}`)
-				.setDesc("A matcher to match note names to templates")
-				.addText((text) =>
-					text
-						.setPlaceholder("Foo")
-						.setValue(matcher)
-						.onChange(async (value) => {
-							this.plugin.settings.matchers[index] = value;
-							await this.plugin.saveSettings();
-						}),
-				)
+			const setting = new Setting(containerEl);
+
+			if (index === 0) {
+				setting.setName("Template by note prefix");
+				setting.setDesc(
+					`Provide a prefix and select a template from the dropdown.
+					Notes that are created with the prefix will be populated with the selected template automatically.`,
+				);
+			}
+
+			setting.addText((text) =>
+				text
+					.setPlaceholder("Note Prefix")
+					.setValue(matcher.prefix)
+					.onChange(async (value) => {
+						this.plugin.settings.matchers[index].prefix = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+			setting
 				.addDropdown((dropdown) => {
+					const templateFolder =
+						this.plugin.app.vault.getFolderByPath(
+							this.plugin.settings.templateFolder,
+						);
+
+					if (!templateFolder) {
+						console.error(
+							`Template folder ${this.plugin.settings.templateFolder} not found`,
+						);
+						return;
+					}
+
+					for (const template of templateFolder.children) {
+						/* This will only load the templates that are files
+					in the root of the template folder. Next step is to
+					allow templates to be in subfolders using
+					TFolder.recurseChildren()
+					https://docs.obsidian.md/Reference/TypeScript+API/Vault/recurseChildren
+
+					Getting working in simplest case for PoC
+					*/
+						if (template instanceof TFile) {
+							dropdown.addOption(
+								template.path,
+								template.basename,
+							);
+						}
+					}
 					dropdown
-						.addOption("Foo", "Foo")
-						.addOption("Bar", "Bar")
-						.setValue(matcher)
+						.setValue(matcher.templatePath)
 						.onChange(async (value) => {
-							this.plugin.settings.matchers[index] = value;
+							this.plugin.settings.matchers[index].templatePath =
+								value;
 							await this.plugin.saveSettings();
 						});
 				})
 				.addButton((text) =>
-					text.setButtonText("Delete").onClick(() => {
+					text.setButtonText("Delete").onClick(async () => {
 						this.plugin.settings.matchers.splice(index, 1);
+						await this.plugin.saveSettings();
 						this.display();
 					}),
 				);
 		});
-
-		/*
-		If matchers is empty, show a message saying "No matchers found"
-		and a description of what matchers are and how to add them.
-		*/
 
 		new Setting(containerEl).setName("Advanced").setHeading();
 
