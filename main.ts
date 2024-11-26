@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting, TFile } from "obsidian";
+import { App, Plugin, PluginSettingTab, Setting, TFile, Vault } from "obsidian";
 
 class Matcher {
 	prefix: string;
@@ -162,22 +162,12 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 						return;
 					}
 
-					for (const template of templateFolder.children) {
-						/* This will only load the templates that are files
-					in the root of the template folder. Next step is to
-					allow templates to be in subfolders using
-					TFolder.recurseChildren()
-					https://docs.obsidian.md/Reference/TypeScript+API/Vault/recurseChildren
-
-					Getting working in simplest case for PoC
-					*/
-						if (template instanceof TFile) {
-							dropdown.addOption(
-								template.path,
-								template.basename,
-							);
+					Vault.recurseChildren(templateFolder, (file) => {
+						if (file instanceof TFile) {
+							dropdown.addOption(file.path, file.basename);
 						}
-					}
+					});
+
 					dropdown
 						.setValue(matcher.templatePath)
 						.onChange(async (value) => {
