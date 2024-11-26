@@ -9,6 +9,7 @@
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
 		"format": "prettier . --write",
+		"check-format": "prettier . --check",
 		"lint": "eslint ."
 	},
 	"keywords": [],
