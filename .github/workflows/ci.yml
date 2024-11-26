@@ -1,0 +1,18 @@
+---
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check_format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bahmutov/npm-install@v1
+      - run: yarn run check-format
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bahmutov/npm-install@v1
+      - run: yarn run lint
