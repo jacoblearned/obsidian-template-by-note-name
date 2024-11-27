@@ -1,14 +1,5 @@
 import { App, Plugin, PluginSettingTab, Setting, TFile, Vault } from "obsidian";
-
-class Matcher {
-	prefix: string;
-	templatePath: string;
-
-	constructor(prefix: string, template: string) {
-		this.prefix = prefix;
-		this.templatePath = template;
-	}
-}
+import Matcher from "./matcher";
 
 interface TemplateByNoteNameSettings {
 	templateFolder: string;
@@ -41,8 +32,7 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 				this.app.vault.on("create", async (file) => {
 					if (file instanceof TFile) {
 						const templatePath = this.settings.matchers.find(
-							(matcher) =>
-								file.basename.startsWith(matcher.prefix),
+							(matcher) => matcher.matches(file),
 						)?.templatePath;
 
 						if (templatePath) {
@@ -82,6 +72,30 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	/* Obsidian advertises that onunload is async, but it is not.
+	See 'Anatomy of a Plugin' in the Obsidian API documentation.
+	https://docs.obsidian.md/Plugins/Getting+started/Anatomy+of+a+plugin
+
+	The first code snippet in that doc contains the following:
+		async onunload() {
+    		// Release any resources configured by the plugin.
+  		}
+
+	While in
+
+	While it isn't ideal to disable no-misused-promises, it is necessary
+	in this case because we need to ensure that we delete all matchers
+	when the user disables the plugin. Without clearing the matchers,
+	the plugin will fail if a user re-enables it and tries to create a note
+	that matches a rule that was previously set.
+	*/
+
+	// eslint-disable-next-line @typescript-eslint/no-misused-promises
+	async onunload() {
+		this.settings.matchers = [];
+		await this.saveSettings();
+	}
 }
 
 class TemplateByNoteNameSettingTab extends PluginSettingTab {
@@ -112,38 +126,50 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Matchers")
+			.setDesc(
+				`A matcher is a rule that determines which template to apply to a note.
+				Notes that are created with the prefix will be populated with the selected template automatically.`,
+			)
 			.setHeading()
 			.addButton((text) =>
 				text.setButtonText("Add").onClick(async () => {
-					this.plugin.settings.matchers.push(new Matcher("", ""));
+					this.plugin.settings.matchers.push(
+						new Matcher("", "", "prefix"),
+					);
 					await this.plugin.saveSettings();
 					this.display();
 				}),
 			);
 
-		// Ensure we have the empty matcher in order to display the help message
-		// in the first matcher element name and description.
+		// Ensure we always display at least one empty matcher
+		// if user deletes all of them
 		if (this.plugin.settings.matchers.length === 0) {
-			this.plugin.settings.matchers.push(new Matcher("", ""));
+			this.plugin.settings.matchers.push(new Matcher("", "", "prefix"));
 		}
 
 		this.plugin.settings.matchers.forEach((matcher, index) => {
 			const setting = new Setting(containerEl);
 
-			if (index === 0) {
-				setting.setName("Template by note prefix");
-				setting.setDesc(
-					`Provide a prefix and select a template from the dropdown.
-					Notes that are created with the prefix will be populated with the selected template automatically.`,
-				);
-			}
+			setting.addDropdown((dropdown) =>
+				dropdown
+					.addOption("prefix", "Prefix")
+					.addOption("suffix", "Suffix")
+					.addOption("contains", "Contains")
+					.setValue(matcher.matchMethod)
+					.onChange(async (value) => {
+						this.plugin.settings.matchers[index].matchMethod =
+							value;
+						await this.plugin.saveSettings();
+					}),
+			);
 
 			setting.addText((text) =>
 				text
-					.setPlaceholder("Note Prefix")
-					.setValue(matcher.prefix)
+					.setPlaceholder("Match String, e.g. 'Meeting'")
+					.setValue(matcher.matchString)
 					.onChange(async (value) => {
-						this.plugin.settings.matchers[index].prefix = value;
+						this.plugin.settings.matchers[index].matchString =
+							value;
 						await this.plugin.saveSettings();
 					}),
 			);
