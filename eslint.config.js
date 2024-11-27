@@ -13,6 +13,11 @@ export default tseslint.config(
 		},
 	},
 	{
-		ignores: ["version-bump.mjs", "esbuild.config.mjs", "eslint.config.js"],
+		ignores: [
+			"version-bump.mjs",
+			"eslint.config.js",
+			"rollup.config.js",
+			"rollup.prod.config.js",
+		],
 	},
 );
