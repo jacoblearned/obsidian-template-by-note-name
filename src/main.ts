@@ -21,7 +21,27 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	}
 
 	async writeToFile(file: TFile, content: string) {
-		await this.app.vault.append(file, content);
+		await this.app.vault.modify(file, content);
+	}
+
+	findMatchingTemplatePath(file: TFile): string {
+		const templatePath = this.settings.matchers.find((matcher) =>
+			matcher.matches(file),
+		)?.templatePath;
+
+		return templatePath || "";
+	}
+
+	async getTemplateContent(templatePath: string): Promise<string> {
+		const template = this.app.vault.getFileByPath(templatePath);
+
+		if (!template) {
+			console.error(`Template ${templatePath} not found`);
+			return "";
+		}
+
+		const templateContent = await this.app.vault.read(template);
+		return templateContent;
 	}
 
 	async onload() {
@@ -31,24 +51,40 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 			this.registerEvent(
 				this.app.vault.on("create", async (file) => {
 					if (file instanceof TFile) {
-						const templatePath = this.settings.matchers.find(
-							(matcher) => matcher.matches(file),
-						)?.templatePath;
+						const templatePath =
+							this.findMatchingTemplatePath(file);
 
 						if (templatePath) {
-							const template =
-								this.app.vault.getFileByPath(templatePath);
+							const templateContent =
+								await this.getTemplateContent(templatePath);
+							await this.writeToFile(file, templateContent);
+						}
+					}
+				}),
+			);
 
-							if (!template) {
-								console.error(
-									`Template ${templatePath} not found`,
-								);
+			this.registerEvent(
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				this.app.vault.on("rename", async (file, _) => {
+					if (file instanceof TFile) {
+						const templatePath =
+							this.findMatchingTemplatePath(file);
+
+						if (templatePath) {
+							if (!this.settings.templateOnRename) {
 								return;
 							}
 
 							const templateContent =
-								await this.app.vault.read(template);
-							await this.writeToFile(file, templateContent);
+								await this.getTemplateContent(templatePath);
+							const fileContent = await this.app.vault.read(file);
+
+							if (this.settings.templateOnRename) {
+								await this.writeToFile(
+									file,
+									`${templateContent}\n\n${fileContent}`,
+								);
+							}
 						}
 					}
 				}),
@@ -155,7 +191,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 					.addOption("prefix", "Prefix")
 					.addOption("suffix", "Suffix")
 					.addOption("contains", "Contains")
-					.setValue(matcher.matchMethod)
+					.setValue("prefix")
 					.onChange(async (value) => {
 						this.plugin.settings.matchers[index].matchMethod =
 							value;
@@ -188,19 +224,19 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 						return;
 					}
 
+					let lastTemplate = "";
 					Vault.recurseChildren(templateFolder, (file) => {
 						if (file instanceof TFile) {
 							dropdown.addOption(file.path, file.basename);
+							lastTemplate = file.path;
 						}
 					});
 
-					dropdown
-						.setValue(matcher.templatePath)
-						.onChange(async (value) => {
-							this.plugin.settings.matchers[index].templatePath =
-								value;
-							await this.plugin.saveSettings();
-						});
+					dropdown.setValue(lastTemplate).onChange(async (value) => {
+						this.plugin.settings.matchers[index].templatePath =
+							value;
+						await this.plugin.saveSettings();
+					});
 				})
 				.addButton((text) =>
 					text.setButtonText("Delete").onClick(async () => {
