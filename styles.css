@@ -6,3 +6,42 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.template-by-note-name-add-matcher-button {
+	background-color: darkgreen !important;
+	margin-left: 20px;
+	font-weight: bold;
+}
+
+.template-by-note-name-add-matcher-button:hover {
+	background-color: rgb(1, 81, 1) !important;
+}
+
+.template-by-note-name-add-matcher-button svg.svg-icon {
+	stroke-width: 4;
+}
+
+.template-by-note-name-matcher-row .setting-item-info {
+	display: none;
+}
+
+.template-by-note-name-matcher-row .setting-item-control {
+	justify-content: flex-start;
+}
+
+.template-by-note-name-matcher-row .setting-item-control .delete-button {
+	margin-left: auto;
+	background-color: darkred;
+	font-weight: bold;
+}
+
+.template-by-note-name-matcher-row .setting-item-control .delete-button:hover {
+	background-color: rgb(113, 1, 1);
+}
+
+.template-by-note-name-matcher-row
+	.setting-item-control
+	.delete-button
+	svg.svg-icon {
+	stroke-width: 4;
+}
