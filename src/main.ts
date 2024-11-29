@@ -146,10 +146,13 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
+		containerEl.createEl("h1", { text: "Template by Note Name" });
 
 		new Setting(containerEl)
 			.setName("Template Folder Location")
-			.setDesc("Files in this folder will be used as templates")
+			.setDesc(
+				"Notes in this folder and any subfolders will be available as templates",
+			)
 			.addText((text) =>
 				text
 					.setPlaceholder("Templates")
@@ -161,10 +164,11 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Matchers")
+			.setName("Matching Rules")
 			.setDesc(
-				`A matcher is a rule that determines which template to apply to a note.
-				Notes that are created with the prefix will be populated with the selected template automatically.`,
+				`A matching rule determines which template to apply to a note based on its title at creation time.
+				If a portion of the note's title matches the rule, the template specified by the rule will be applied to the note.
+				Only one template can be applied to a note.`,
 			)
 			.setHeading()
 			.addButton((text) =>
@@ -264,7 +268,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Template on Rename")
 			.setDesc(
-				"When an existing note's name is changed to a matching template, prepend the matching template to the note's content.",
+				"When an existing note's name is changed to one that matches a rule, the plugin will prepend the rule's template to the note's content.",
 			)
 			.addToggle((toggle) =>
 				toggle
