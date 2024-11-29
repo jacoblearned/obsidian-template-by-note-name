@@ -168,13 +168,17 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 			)
 			.setHeading()
 			.addButton((text) =>
-				text.setButtonText("Add").onClick(async () => {
-					this.plugin.settings.matchers.push(
-						new Matcher("", "", "prefix"),
-					);
-					await this.plugin.saveSettings();
-					this.display();
-				}),
+				text
+					.setButtonText("Add")
+					.setClass("template-by-note-name-add-matcher-button")
+					.setIcon("plus")
+					.onClick(async () => {
+						this.plugin.settings.matchers.push(
+							new Matcher("", "", "prefix"),
+						);
+						await this.plugin.saveSettings();
+						this.display();
+					}),
 			);
 
 		// Ensure we always display at least one empty matcher
@@ -186,12 +190,14 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		this.plugin.settings.matchers.forEach((matcher, index) => {
 			const setting = new Setting(containerEl);
 
+			setting.controlEl.appendText("If note name");
+			setting.setClass("template-by-note-name-matcher-row");
 			setting.addDropdown((dropdown) =>
 				dropdown
-					.addOption("prefix", "Prefix")
-					.addOption("suffix", "Suffix")
-					.addOption("contains", "Contains")
-					.setValue("prefix")
+					.addOption("prefix", "starts with")
+					.addOption("contains", "contains")
+					.addOption("suffix", "ends with")
+					.setValue(matcher.matchMethod)
 					.onChange(async (value) => {
 						this.plugin.settings.matchers[index].matchMethod =
 							value;
@@ -201,7 +207,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 
 			setting.addText((text) =>
 				text
-					.setPlaceholder("Match String, e.g. 'Meeting'")
+					.setPlaceholder("e.g. 'TODO'")
 					.setValue(matcher.matchString)
 					.onChange(async (value) => {
 						this.plugin.settings.matchers[index].matchString =
@@ -209,6 +215,8 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}),
 			);
+
+			setting.controlEl.appendText("use template");
 
 			setting
 				.addDropdown((dropdown) => {
@@ -224,26 +232,30 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 						return;
 					}
 
-					let lastTemplate = "";
 					Vault.recurseChildren(templateFolder, (file) => {
 						if (file instanceof TFile) {
 							dropdown.addOption(file.path, file.basename);
-							lastTemplate = file.path;
 						}
 					});
 
-					dropdown.setValue(lastTemplate).onChange(async (value) => {
-						this.plugin.settings.matchers[index].templatePath =
-							value;
-						await this.plugin.saveSettings();
-					});
+					dropdown
+						.setValue(matcher.templatePath)
+						.onChange(async (value) => {
+							this.plugin.settings.matchers[index].templatePath =
+								value;
+							await this.plugin.saveSettings();
+						});
 				})
 				.addButton((text) =>
-					text.setButtonText("Delete").onClick(async () => {
-						this.plugin.settings.matchers.splice(index, 1);
-						await this.plugin.saveSettings();
-						this.display();
-					}),
+					text
+						.setButtonText("Delete")
+						.setClass("delete-button")
+						.setIcon("minus")
+						.onClick(async () => {
+							this.plugin.settings.matchers.splice(index, 1);
+							await this.plugin.saveSettings();
+							this.display();
+						}),
 				);
 		});
 
