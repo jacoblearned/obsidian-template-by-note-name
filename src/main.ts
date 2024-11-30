@@ -1,4 +1,12 @@
-import { App, Plugin, PluginSettingTab, Setting, TFile, Vault } from "obsidian";
+import {
+	App,
+	Plugin,
+	PluginSettingTab,
+	Setting,
+	TFile,
+	Vault,
+	Platform,
+} from "obsidian";
 import Matcher from "./matcher";
 
 interface TemplateByNoteNameSettings {
@@ -146,6 +154,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
+
 		containerEl.createEl("h1", { text: "Template by Note Name" });
 
 		new Setting(containerEl)
@@ -194,7 +203,10 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		this.plugin.settings.matchers.forEach((matcher, index) => {
 			const setting = new Setting(containerEl);
 
-			setting.controlEl.appendText("If note name");
+			if (!Platform.isMobile) {
+				setting.controlEl.appendText("If note name");
+			}
+
 			setting.setClass("template-by-note-name-matcher-row");
 			setting.addDropdown((dropdown) =>
 				dropdown
@@ -220,7 +232,9 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 					}),
 			);
 
-			setting.controlEl.appendText("use template");
+			if (!Platform.isMobile) {
+				setting.controlEl.appendText("use template");
+			}
 
 			setting
 				.addDropdown((dropdown) => {
