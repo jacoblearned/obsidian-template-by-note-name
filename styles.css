@@ -11,6 +11,9 @@ If your plugin does not need CSS, delete this file.
 	background-color: darkgreen !important;
 	margin-left: 20px;
 	font-weight: bold;
+	max-width: 44px;
+	min-width: 44px;
+	padding: 4px 10px !important;
 }
 
 .template-by-note-name-add-matcher-button:hover {
@@ -29,10 +32,17 @@ If your plugin does not need CSS, delete this file.
 	justify-content: flex-start;
 }
 
+.template-by-note-name-matcher-row .setting-item-control input {
+	min-width: 132px;
+}
+
 .template-by-note-name-matcher-row .setting-item-control .delete-button {
 	margin-left: auto;
 	background-color: darkred;
 	font-weight: bold;
+	max-width: 44px;
+	min-width: 44px;
+	padding: 4px 10px;
 }
 
 .template-by-note-name-matcher-row .setting-item-control .delete-button:hover {
