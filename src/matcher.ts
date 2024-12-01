@@ -1,5 +1,3 @@
-import { TFile } from "obsidian";
-
 export default class Matcher {
 	matchString: string;
 	templatePath: string;
@@ -11,14 +9,14 @@ export default class Matcher {
 		this.matchMethod = matchMethod.toLowerCase().trim();
 	}
 
-	matches(file: TFile): boolean {
+	matches(fileName: string): boolean {
 		switch (this.matchMethod) {
 			case "prefix":
-				return file.basename.startsWith(this.matchString);
+				return fileName.startsWith(this.matchString);
 			case "suffix":
-				return file.basename.endsWith(this.matchString);
+				return fileName.endsWith(this.matchString);
 			case "contains":
-				return file.basename.includes(this.matchString);
+				return fileName.includes(this.matchString);
 			default:
 				return false;
 		}

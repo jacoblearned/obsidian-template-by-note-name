@@ -32,12 +32,10 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		await this.app.vault.modify(file, content);
 	}
 
-	findMatchingTemplatePath(file: TFile): string {
-		const templatePath = this.settings.matchers.find((matcher) =>
-			matcher.matches(file),
-		)?.templatePath;
-
-		return templatePath || "";
+	findMatcherForFile(file: TFile): Matcher | undefined {
+		return this.settings.matchers.find((matcher) =>
+			matcher.matches(file.basename),
+		);
 	}
 
 	async getTemplateContent(templatePath: string): Promise<string> {
@@ -52,6 +50,47 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		return templateContent;
 	}
 
+	async templateOnCreate(file: TFile) {
+		const templatePath = this.findMatcherForFile(file)?.templatePath;
+
+		if (templatePath) {
+			const templateContent = await this.getTemplateContent(templatePath);
+			await this.writeToFile(file, templateContent);
+		}
+	}
+
+	async templateOnRename(file: TFile, oldName: string) {
+		const matcher = this.findMatcherForFile(file);
+
+		if (matcher) {
+			const templatePath = matcher.templatePath;
+			if (!this.settings.templateOnRename) {
+				return;
+			}
+
+			/* We only want to prepend the template content if the note was renamed to match a rule
+			and the oldName does not match the rule the note now matches.
+			This prevents the template content from being prepended multiple times on subsequent renames.
+
+			oldName is the full path to the note from the vault root, e.g. "Path/To/Note.md"
+			*/
+			const oldBaseName = oldName.split("/").pop()?.slice(0, -3);
+			if (matcher.matches(oldBaseName ?? "")) {
+				return;
+			}
+
+			const templateContent = await this.getTemplateContent(templatePath);
+			const fileContent = await this.app.vault.read(file);
+
+			if (this.settings.templateOnRename) {
+				await this.writeToFile(
+					file,
+					`${templateContent}\n\n${fileContent}`,
+				);
+			}
+		}
+	}
+
 	async onload() {
 		await this.loadSettings();
 
@@ -59,41 +98,15 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 			this.registerEvent(
 				this.app.vault.on("create", async (file) => {
 					if (file instanceof TFile) {
-						const templatePath =
-							this.findMatchingTemplatePath(file);
-
-						if (templatePath) {
-							const templateContent =
-								await this.getTemplateContent(templatePath);
-							await this.writeToFile(file, templateContent);
-						}
+						await this.templateOnCreate(file);
 					}
 				}),
 			);
 
 			this.registerEvent(
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-				this.app.vault.on("rename", async (file, _) => {
+				this.app.vault.on("rename", async (file, oldName) => {
 					if (file instanceof TFile) {
-						const templatePath =
-							this.findMatchingTemplatePath(file);
-
-						if (templatePath) {
-							if (!this.settings.templateOnRename) {
-								return;
-							}
-
-							const templateContent =
-								await this.getTemplateContent(templatePath);
-							const fileContent = await this.app.vault.read(file);
-
-							if (this.settings.templateOnRename) {
-								await this.writeToFile(
-									file,
-									`${templateContent}\n\n${fileContent}`,
-								);
-							}
-						}
+						await this.templateOnRename(file, oldName);
 					}
 				}),
 			);
@@ -125,8 +138,6 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		async onunload() {
     		// Release any resources configured by the plugin.
   		}
-
-	While in
 
 	While it isn't ideal to disable no-misused-promises, it is necessary
 	in this case because we need to ensure that we delete all matchers
