@@ -4,8 +4,8 @@
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "Automatically template new notes based on their title.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"author": "Jacob Learned",
+	"authorUrl": "https://github.com/jacoblearned",
+	"fundingUrl": "https://buymeacoffee.com/jacoblearned",
 	"isDesktopOnly": false
 }

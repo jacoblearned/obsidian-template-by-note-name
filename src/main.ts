@@ -11,7 +11,6 @@ import Matcher from "./matcher";
 
 /**
  * TemplateByNoteNameSettings represents the user-provided settings for the plugin.
- *
  */
 export interface TemplateByNoteNameSettings {
 	/** Path to folder from vault root where user stores their templates */
