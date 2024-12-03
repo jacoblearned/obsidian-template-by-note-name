@@ -16,7 +16,8 @@ to automatically template any note that starts with `TODO` with the content of t
 - **Multiple match options**: Choose from prefix, suffix, or contains to template notes
 - **Optionally template on rename**: Choose whether or not to template notes when they are renamed
   If a note is renamed to a matching template, the template content will be prepended to the existing note.
+- **Case sensitivity options**: Choose whether or not to match note names against rules in a case-sensitive manner
 
 ## Settings
 
-![plugin-settings](assets/PluginSettingsScreenshot.png)
+![Plugin Settings](assets/PluginSettingsScreenshot.png)

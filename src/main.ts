@@ -19,13 +19,17 @@ export interface TemplateByNoteNameSettings {
 	/** Whether to apply a template to a note when it is renamed to match a rule */
 	templateOnRename: boolean;
 
+	/** Whether to match note names against user-provided rule match strings in a case-sensitive manner */
+	caseSensitive: boolean;
+
 	/** Collection of user-provided matching rules to determine which template to apply to a new or renamed note */
 	matchers: Matcher[];
 }
 
 const DEFAULT_SETTINGS: TemplateByNoteNameSettings = {
 	templateFolder: "Templates",
-	templateOnRename: false,
+	templateOnRename: true,
+	caseSensitive: true,
 	matchers: [],
 };
 
@@ -53,7 +57,7 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	 */
 	findMatcherForFile(file: TFile): Matcher | undefined {
 		return this.settings.matchers.find((matcher) =>
-			matcher.matches(file.basename),
+			matcher.matches(file.basename, this.settings.caseSensitive),
 		);
 	}
 
@@ -107,8 +111,8 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 
 			oldName is the full path to the note from the vault root, e.g. "Path/To/Note.md"
 			*/
-			const oldBaseName = oldName.split("/").pop()?.slice(0, -3);
-			if (matcher.matches(oldBaseName ?? "")) {
+			const oldBaseName = oldName.split("/").pop()?.slice(0, -3) ?? "";
+			if (matcher.matches(oldBaseName, this.settings.caseSensitive)) {
 				return;
 			}
 
@@ -359,6 +363,20 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.templateOnRename)
 					.onChange(async (value) => {
 						this.plugin.settings.templateOnRename = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Case-Sensitive Matching")
+			.setDesc(
+				"When disabled, note names will be matched against rules in a case-insensitive manner, e.g. 'todo' will match 'TODO'.",
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.caseSensitive)
+					.onChange(async (value) => {
+						this.plugin.settings.caseSensitive = value;
 						await this.plugin.saveSettings();
 					}),
 			);
