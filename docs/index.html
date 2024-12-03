@@ -1,0 +1,80 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="."><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>obsidian-template-by-note-name</title><meta name="description" content="Documentation for obsidian-template-by-note-name"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search"><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">obsidian-template-by-note-name</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>obsidian-template-by-note-name</h1></div><div class="tsd-panel tsd-typography"><a id="obsidian-sample-plugin" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Obsidian Sample Plugin<a href="#obsidian-sample-plugin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><p>This is a sample plugin for Obsidian (<a href="https://obsidian.md" target="_blank" class="external">https://obsidian.md</a>).</p>
+<p>This project uses Typescript to provide type checking and documentation.
+The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.</p>
+<p><strong>Note:</strong> The Obsidian API is still in early alpha and is subject to change at any time!</p>
+<p>This sample plugin demonstrates some of the basic functionality the plugin API can do.</p>
+<ul>
+<li>Adds a ribbon icon, which shows a Notice when clicked.</li>
+<li>Adds a command &quot;Open Sample Modal&quot; which opens a Modal.</li>
+<li>Adds a plugin setting tab to the settings page.</li>
+<li>Registers a global click event and output 'click' to the console.</li>
+<li>Registers a global interval which logs 'setInterval' to the console.</li>
+</ul>
+<a id="first-time-developing-plugins" class="tsd-anchor"></a><h2 class="tsd-anchor-link">First time developing plugins?<a href="#first-time-developing-plugins" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Quick starting guide for new plugin devs:</p>
+<ul>
+<li>Check if <a href="https://obsidian.md/plugins" target="_blank" class="external">someone already developed a plugin for what you want</a>! There might be an existing plugin similar enough that you can partner up with.</li>
+<li>Make a copy of this repo as a template with the &quot;Use this template&quot; button (login to GitHub if you don't see it).</li>
+<li>Clone your repo to a local development folder. For convenience, you can place this folder in your <code>.obsidian/plugins/your-plugin-name</code> folder.</li>
+<li>Install NodeJS, then run <code>npm i</code> in the command line under your repo folder.</li>
+<li>Run <code>npm run dev</code> to compile your plugin from <code>main.ts</code> to <code>main.js</code>.</li>
+<li>Make changes to <code>main.ts</code> (or create new <code>.ts</code> files). Those changes should be automatically compiled into <code>main.js</code>.</li>
+<li>Reload Obsidian to load the new version of your plugin.</li>
+<li>Enable plugin in settings window.</li>
+<li>For updates to the Obsidian API run <code>npm update</code> in the command line under your repo folder.</li>
+</ul>
+<a id="releasing-new-releases" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Releasing new releases<a href="#releasing-new-releases" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Update your <code>manifest.json</code> with your new version number, such as <code>1.0.1</code>, and the minimum Obsidian version required for your latest release.</li>
+<li>Update your <code>versions.json</code> file with <code>&quot;new-plugin-version&quot;: &quot;minimum-obsidian-version&quot;</code> so older versions of Obsidian can download an older version of your plugin that's compatible.</li>
+<li>Create new GitHub release using your new version number as the &quot;Tag version&quot;. Use the exact version number, don't include a prefix <code>v</code>. See here for an example: <a href="https://github.com/obsidianmd/obsidian-sample-plugin/releases" target="_blank" class="external">https://github.com/obsidianmd/obsidian-sample-plugin/releases</a></li>
+<li>Upload the files <code>manifest.json</code>, <code>main.js</code>, <code>styles.css</code> as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.</li>
+<li>Publish the release.</li>
+</ul>
+<blockquote>
+<p>You can simplify the version bump process by running <code>npm version patch</code>, <code>npm version minor</code> or <code>npm version major</code> after updating <code>minAppVersion</code> manually in <code>manifest.json</code>.
+The command will bump version in <code>manifest.json</code> and <code>package.json</code>, and add the entry for the new version to <code>versions.json</code></p>
+</blockquote>
+<a id="adding-your-plugin-to-the-community-plugin-list" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Adding your plugin to the community plugin list<a href="#adding-your-plugin-to-the-community-plugin-list" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Check <a href="https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md" target="_blank" class="external">https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md</a></li>
+<li>Publish an initial version.</li>
+<li>Make sure you have a <code>README.md</code> file in the root of your repo.</li>
+<li>Make a pull request at <a href="https://github.com/obsidianmd/obsidian-releases" target="_blank" class="external">https://github.com/obsidianmd/obsidian-releases</a> to add your plugin.</li>
+</ul>
+<a id="how-to-use" class="tsd-anchor"></a><h2 class="tsd-anchor-link">How to use<a href="#how-to-use" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Clone this repo.</li>
+<li>Make sure your NodeJS is at least v16 (<code>node --version</code>).</li>
+<li><code>npm i</code> or <code>yarn</code> to install dependencies.</li>
+<li><code>npm run dev</code> to start compilation in watch mode.</li>
+</ul>
+<a id="manually-installing-the-plugin" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Manually installing the plugin<a href="#manually-installing-the-plugin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Copy over <code>main.js</code>, <code>styles.css</code>, <code>manifest.json</code> to your vault <code>VaultFolder/.obsidian/plugins/your-plugin-id/</code>.</li>
+</ul>
+<a id="improve-code-quality-with-eslint-optional" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Improve code quality with eslint (optional)<a href="#improve-code-quality-with-eslint-optional" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><a href="https://eslint.org/" target="_blank" class="external">ESLint</a> is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code.</li>
+<li>To use eslint with this project, make sure to install eslint from terminal:
+<ul>
+<li><code>npm install -g eslint</code></li>
+</ul>
+</li>
+<li>To use eslint to analyze this project use this command:
+<ul>
+<li><code>eslint main.ts</code></li>
+<li>eslint will then create a report with suggestions for code improvement by file and line number.</li>
+</ul>
+</li>
+<li>If your source code is in a folder, such as <code>src</code>, you can use eslint with this command to analyze all files in that folder:
+<ul>
+<li><code>eslint .\src\</code></li>
+</ul>
+</li>
+</ul>
+<a id="funding-url" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Funding URL<a href="#funding-url" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>You can include funding URLs where people who use your plugin can financially support it.</p>
+<p>The simple way is to set the <code>fundingUrl</code> field to your link in your <code>manifest.json</code> file:</p>
+<pre><code class="json"><span class="hl-0">{</span><br/><span class="hl-0">	</span><span class="hl-1">&quot;fundingUrl&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;https://buymeacoffee.com&quot;</span><br/><span class="hl-0">}</span>
+</code><button type="button">Copy</button></pre>
+
+<p>If you have multiple URLs, you can also do:</p>
+<pre><code class="json"><span class="hl-0">{</span><br/><span class="hl-0">	</span><span class="hl-1">&quot;fundingUrl&quot;</span><span class="hl-0">: {</span><br/><span class="hl-0">		</span><span class="hl-1">&quot;Buy Me a Coffee&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;https://buymeacoffee.com&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">		</span><span class="hl-1">&quot;GitHub Sponsor&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;https://github.com/sponsors&quot;</span><span class="hl-0">,</span><br/><span class="hl-0">		</span><span class="hl-1">&quot;Patreon&quot;</span><span class="hl-0">: </span><span class="hl-2">&quot;https://www.patreon.com/&quot;</span><br/><span class="hl-0">	}</span><br/><span class="hl-0">}</span>
+</code><button type="button">Copy</button></pre>
+
+<a id="api-documentation" class="tsd-anchor"></a><h2 class="tsd-anchor-link">API Documentation<a href="#api-documentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>See <a href="https://github.com/obsidianmd/obsidian-api" target="_blank" class="external">https://github.com/obsidianmd/obsidian-api</a></p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#obsidian-sample-plugin"><span>Obsidian <wbr/>Sample <wbr/>Plugin</span></a><ul><li><a href="#first-time-developing-plugins"><span>First time developing plugins?</span></a></li><li><a href="#releasing-new-releases"><span>Releasing new releases</span></a></li><li><a href="#adding-your-plugin-to-the-community-plugin-list"><span>Adding your plugin to the community plugin list</span></a></li><li><a href="#how-to-use"><span>How to use</span></a></li><li><a href="#manually-installing-the-plugin"><span>Manually installing the plugin</span></a></li><li><a href="#improve-code-quality-with-eslint-optional"><span>Improve code quality with eslint (optional)</span></a></li><li><a href="#funding-url"><span>Funding URL</span></a></li><li><a href="#api-documentation"><span>API <wbr/>Documentation</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html" class="current">obsidian-template-by-note-name</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
