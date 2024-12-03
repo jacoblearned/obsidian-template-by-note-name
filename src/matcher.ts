@@ -26,6 +26,10 @@ export default class Matcher {
 	 * @returns {boolean} Whether or not the file matches the Matcher's rule
 	 */
 	matches(fileName: string): boolean {
+		if (this.matchString.trim() === "") {
+			return false;
+		}
+
 		switch (this.matchMethod) {
 			case "prefix":
 				return fileName.startsWith(this.matchString);
