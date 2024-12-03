@@ -9,9 +9,18 @@ import {
 } from "obsidian";
 import Matcher from "./matcher";
 
-interface TemplateByNoteNameSettings {
+/**
+ * TemplateByNoteNameSettings represents the user-provided settings for the plugin.
+ *
+ */
+export interface TemplateByNoteNameSettings {
+	/** Path to folder from vault root where user stores their templates */
 	templateFolder: string;
+
+	/** Whether to apply a template to a note when it is renamed to match a rule */
 	templateOnRename: boolean;
+
+	/** Collection of user-provided matching rules to determine which template to apply to a new or renamed note */
 	matchers: Matcher[];
 }
 
@@ -21,23 +30,39 @@ const DEFAULT_SETTINGS: TemplateByNoteNameSettings = {
 	matchers: [],
 };
 
+/**
+ * TemplateByNoteNamePlugin is the main class that handles the plugin's lifecycle.
+ * @extends Plugin
+ */
 export default class TemplateByNoteNamePlugin extends Plugin {
+	/**  Collection of user-provided settings values set in plugin settings tab  */
 	settings: TemplateByNoteNameSettings;
 
-	async logFileContent(file: TFile) {
-		console.log(await this.app.vault.read(file));
-	}
-
+	/**
+	 * Write the given content to the provided file.
+	 * @param file The Obsidian file object representing an existing note
+	 * @param content The content to write to the note, overwriting the existing content
+	 */
 	async writeToFile(file: TFile, content: string) {
 		await this.app.vault.modify(file, content);
 	}
 
+	/**
+	 * Find the first Matcher instance in the user-provided settings that matches the given file.
+	 * @param file The Obsidian file object representing an existing note
+	 * @returns The first Matcher whose rule matches the file, or undefined if no match is found
+	 */
 	findMatcherForFile(file: TFile): Matcher | undefined {
 		return this.settings.matchers.find((matcher) =>
 			matcher.matches(file.basename),
 		);
 	}
 
+	/**
+	 * Get the content of the template note at the provided path.
+	 * @param templatePath Full path to a template note from the vault root
+	 * @returns The content of the template file
+	 */
 	async getTemplateContent(templatePath: string): Promise<string> {
 		const template = this.app.vault.getFileByPath(templatePath);
 
@@ -50,6 +75,10 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		return templateContent;
 	}
 
+	/**
+	 * Apply a template to a new note if the note name matches a user-provided rule.
+	 * @param file The Obsidian file object representing the newly created note
+	 */
 	async templateOnCreate(file: TFile) {
 		const templatePath = this.findMatcherForFile(file)?.templatePath;
 
@@ -59,6 +88,11 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		}
 	}
 
+	/**
+	 * Apply a template to a renamed note if the new name matches a user-provided rule.
+	 * @param file The Obsidian file object representing the renamed note
+	 * @param oldName The full path to the note from the vault root before it was renamed
+	 */
 	async templateOnRename(file: TFile, oldName: string) {
 		const matcher = this.findMatcherForFile(file);
 
@@ -91,6 +125,9 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		}
 	}
 
+	/**
+	 * Load the plugin's user-provided settings and register event listeners.
+	 */
 	async onload() {
 		await this.loadSettings();
 
@@ -117,6 +154,9 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		this.addSettingTab(new TemplateByNoteNameSettingTab(this.app, this));
 	}
 
+	/**
+	 * Load the plugin's current user-provided settings on top of the default settings.
+	 */
 	async loadSettings() {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		this.settings = Object.assign(
@@ -126,11 +166,14 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		);
 	}
 
+	/**
+	 * Save the plugin's current settings to disk
+	 */
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
 
-	/* Obsidian advertises that onunload is async, but it is not.
+	/* Obsidian advertises that onunload() is async, but it is not.
 	See 'Anatomy of a Plugin' in the Obsidian API documentation.
 	https://docs.obsidian.md/Plugins/Getting+started/Anatomy+of+a+plugin
 
@@ -146,6 +189,9 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	that matches a rule that was previously set.
 	*/
 
+	/**
+	 * Clear all matchers when the plugin is disabled.
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-misused-promises
 	async onunload() {
 		this.settings.matchers = [];
@@ -153,14 +199,28 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	}
 }
 
+/**
+ * TemplateByNoteNameSettingTab represents the view for the user-specific plugin settings
+ * like the template folder location and matching rules.
+ * @extends PluginSettingTab
+ */
 class TemplateByNoteNameSettingTab extends PluginSettingTab {
+	/** Plugin instance */
 	plugin: TemplateByNoteNamePlugin;
 
+	/**
+	 * Create a new TemplateByNoteNameSettingTab.
+	 * @param app The Obsidian application instance
+	 * @param plugin The plugin instance
+	 */
 	constructor(app: App, plugin: TemplateByNoteNamePlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Create the HTML elements for the settings tab.
+	 */
 	display(): void {
 		const { containerEl } = this;
 
@@ -206,7 +266,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 			);
 
 		// Ensure we always display at least one empty matcher
-		// if user deletes all of them
+		// if user deletes attempts to delete all of them
 		if (this.plugin.settings.matchers.length === 0) {
 			this.plugin.settings.matchers.push(new Matcher("", "", "prefix"));
 		}
