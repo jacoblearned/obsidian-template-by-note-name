@@ -23,20 +23,26 @@ export default class Matcher {
 	 * Check if a file matches the rule.
 	 * @param fileName Basename of the file to check,
 	 * 	e.g. "my_template" for a note with path "Templates/my_template.md"
-	 * @returns {boolean} Whether or not the file matches the Matcher's rule
+	 * @param caseSensitive Whether to compare file names and match strings case-sensitively
+	 * @returns Whether the file matches the Matcher's rule
 	 */
-	matches(fileName: string): boolean {
+	matches(fileName: string, caseSensitive: boolean): boolean {
 		if (this.matchString.trim() === "") {
 			return false;
 		}
 
+		fileName = caseSensitive ? fileName : fileName.toLowerCase();
+		const matchString = caseSensitive
+			? this.matchString
+			: this.matchString.toLowerCase();
+
 		switch (this.matchMethod) {
 			case "prefix":
-				return fileName.startsWith(this.matchString);
+				return fileName.startsWith(matchString);
 			case "suffix":
-				return fileName.endsWith(this.matchString);
+				return fileName.endsWith(matchString);
 			case "contains":
-				return fileName.includes(this.matchString);
+				return fileName.includes(matchString);
 			default:
 				return false;
 		}
