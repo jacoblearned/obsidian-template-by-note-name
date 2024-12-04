@@ -48,7 +48,9 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	 * @param content The content to write to the note, overwriting the existing content
 	 */
 	async writeToFile(file: TFile, content: string) {
-		await this.app.vault.modify(file, content);
+		await this.app.vault.process(file, () => {
+			return content;
+		});
 	}
 
 	/**
