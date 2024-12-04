@@ -233,7 +233,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		containerEl.addClass("template-by-note-name-settings");
 
 		new Setting(containerEl)
-			.setName("Template Folder Location")
+			.setName("Template folder location")
 			.setDesc(
 				"Notes in this folder and any subfolders will be available as templates",
 			)
@@ -248,7 +248,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Matching Rules")
+			.setName("Matching rules")
 			.setDesc(
 				`A matching rule determines which template to apply to a note based on its title at creation time.
 				If a portion of the note's title matches the rule, the template specified by the rule will be applied to the note.
@@ -355,7 +355,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName("Advanced").setHeading();
 
 		new Setting(containerEl)
-			.setName("Template on Rename")
+			.setName("Template on rename")
 			.setDesc(
 				"When an existing note's name is changed to one that matches a rule, the plugin will prepend the rule's template to the note's content.",
 			)
@@ -369,7 +369,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Case-Sensitive Matching")
+			.setName("Case-Sensitive matching")
 			.setDesc(
 				"When disabled, note names will be matched against rules in a case-insensitive manner, e.g. 'todo' will match 'TODO'.",
 			)
