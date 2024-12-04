@@ -19,6 +19,7 @@ export default tseslint.config(
 			"rollup.config.js",
 			"rollup.prod.config.js",
 			"docs/**",
+			"dist/**",
 		],
 	},
 );
