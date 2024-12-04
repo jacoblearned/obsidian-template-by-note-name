@@ -230,6 +230,7 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		containerEl.createEl("h1", { text: "Template by Note Name" });
+		containerEl.addClass("template-by-note-name-settings");
 
 		new Setting(containerEl)
 			.setName("Template Folder Location")
