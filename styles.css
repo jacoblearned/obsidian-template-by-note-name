@@ -7,17 +7,26 @@ If your plugin does not need CSS, delete this file.
 
 */
 
+/* Container element for settings tab, used for defining plugin-specific variables */
+.template-by-note-name-settings {
+	--color-darkgreen: darkgreen;
+	--color-darkgreen-hover: rgb(1, 81, 1);
+	--color-darkred: darkred;
+	--color-darkred-hover: rgb(113, 1, 1);
+}
+
 .template-by-note-name-add-matcher-button {
-	background-color: darkgreen !important;
+	--interactive-normal: var(--color-darkgreen);
+	background-color: var(--color-darkgreen);
 	margin-left: 20px;
 	font-weight: bold;
 	max-width: 44px;
 	min-width: 44px;
-	padding: 4px 10px !important;
+	padding: 4px 10px;
 }
 
 .template-by-note-name-add-matcher-button:hover {
-	background-color: rgb(1, 81, 1) !important;
+	background-color: var(--color-darkgreen-hover);
 }
 
 .template-by-note-name-add-matcher-button svg.svg-icon {
@@ -38,7 +47,7 @@ If your plugin does not need CSS, delete this file.
 
 .template-by-note-name-matcher-row .setting-item-control .delete-button {
 	margin-left: auto;
-	background-color: darkred;
+	background-color: var(--color-darkred);
 	font-weight: bold;
 	max-width: 44px;
 	min-width: 44px;
@@ -46,7 +55,7 @@ If your plugin does not need CSS, delete this file.
 }
 
 .template-by-note-name-matcher-row .setting-item-control .delete-button:hover {
-	background-color: rgb(113, 1, 1);
+	background-color: var(--color-darkred-hover);
 }
 
 .template-by-note-name-matcher-row
