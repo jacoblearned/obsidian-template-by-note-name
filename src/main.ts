@@ -6,6 +6,7 @@ import {
 	TFile,
 	Vault,
 	Platform,
+	normalizePath,
 } from "obsidian";
 import Matcher from "./matcher";
 
@@ -242,7 +243,8 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 					.setPlaceholder("Templates")
 					.setValue(this.plugin.settings.templateFolder)
 					.onChange(async (value) => {
-						this.plugin.settings.templateFolder = value;
+						this.plugin.settings.templateFolder =
+							normalizePath(value);
 						await this.plugin.saveSettings();
 					}),
 			);
