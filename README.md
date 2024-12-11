@@ -1,4 +1,4 @@
-# Obsidian Template by Note Name
+# Template by Note Name
 
 This is a simple [Obsidian](https://obsidian.md/) plugin to automatically template notes
 based on their name when created or renamed. Users can template notes that match
