@@ -48,9 +48,7 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	 * @param content The content to write to the note, overwriting the existing content
 	 */
 	async writeToFile(file: TFile, content: string) {
-		await this.app.vault.process(file, () => {
-			return content;
-		});
+		await this.app.vault.modify(file, content);
 	}
 
 	/**
@@ -231,8 +229,6 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
-
-		containerEl.createEl("h1", { text: "Template by Note Name" });
 		containerEl.addClass("template-by-note-name-settings");
 
 		new Setting(containerEl)
