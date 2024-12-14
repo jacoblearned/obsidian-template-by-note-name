@@ -7,6 +7,7 @@ import {
 	Vault,
 	Platform,
 	normalizePath,
+	moment,
 } from "obsidian";
 import Matcher from "./matcher";
 
@@ -16,6 +17,12 @@ import Matcher from "./matcher";
 export interface TemplateByNoteNameSettings {
 	/** Path to folder from vault root where user stores their templates */
 	templateFolder: string;
+
+	/** Date format used in templates */
+	dateFormat: string;
+
+	/** Whether to apply a template to a note when it is renamed to match a rule */
+	timeFormat: string;
 
 	/** Whether to apply a template to a note when it is renamed to match a rule */
 	templateOnRename: boolean;
@@ -29,6 +36,8 @@ export interface TemplateByNoteNameSettings {
 
 const DEFAULT_SETTINGS: TemplateByNoteNameSettings = {
 	templateFolder: "Templates",
+	dateFormat: "YYYY-MM-DD",
+	timeFormat: "HH:mm",
 	templateOnRename: true,
 	caseSensitive: true,
 	matchers: [],
@@ -76,7 +85,64 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 		}
 
 		const templateContent = await this.app.vault.read(template);
-		return templateContent;
+		return this.evaluateTemplate(templateContent);
+	}
+
+	/** Evaluate any {{date}} or {{time}} variables in template content
+	 * @param template The template content to evaluate
+	 * @returns The template content with any date or time variables replaced according to user format settings.
+	 */
+	evaluateTemplate(template: string): string {
+		template = this.replaceDates(template);
+		return this.replaceTimes(template);
+	}
+
+	/**
+	 * Replace any {{date}} or {{date:format}} variables in the content with the current date.
+	 * Supported formats are those provided by moment.js: https://momentjs.com/docs/#/displaying/format/
+	 * @param content The content to replace date variables in
+	 * @returns The content with date variables replaced
+	 */
+	replaceDates(content: string): string {
+		return content.replace(
+			/{{(.+?)}}/g,
+			(match, bracketContent: string) => {
+				if (bracketContent == "date") {
+					return moment().format(this.settings.dateFormat);
+				}
+
+				if (bracketContent.startsWith("date:")) {
+					const format = bracketContent.replace("date:", "");
+					return moment().format(format);
+				}
+
+				return match;
+			},
+		);
+	}
+
+	/**
+	 * Replace any {{time}} or {{time:format}} variables in the content with the current time.
+	 * Supported formats are those provided by moment.js: https://momentjs.com/docs/#/displaying/format/
+	 * @param content The content to replace time variables in
+	 * @returns The content with time variables replaced
+	 */
+	replaceTimes(content: string): string {
+		return content.replace(
+			/{{(.+?)}}/g,
+			(match, bracketContent: string) => {
+				if (bracketContent == "time") {
+					return moment().format(this.settings.timeFormat);
+				}
+
+				if (bracketContent.startsWith("time:")) {
+					const format = bracketContent.replace("time:", "");
+					return moment().format(format);
+				}
+
+				return match;
+			},
+		);
 	}
 
 	/**
@@ -243,6 +309,36 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.templateFolder =
 							normalizePath(value);
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Date format")
+			.setDesc(
+				"Date format used in templates. Both {{date}} and one-time overrides like {{date:YYYY-MM-DD}} are supported.",
+			)
+			.addMomentFormat((text) =>
+				text
+					.setDefaultFormat("YYYY-MM-DD")
+					.setValue(this.plugin.settings.dateFormat)
+					.onChange(async (value) => {
+						this.plugin.settings.dateFormat = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Time format")
+			.setDesc(
+				"Time format used in templates. Both {{time}} and one-time overrides like {{time:HH:mm}} are supported.",
+			)
+			.addMomentFormat((text) =>
+				text
+					.setDefaultFormat("HH:mm")
+					.setValue(this.plugin.settings.timeFormat)
+					.onChange(async (value) => {
+						this.plugin.settings.timeFormat = value;
 						await this.plugin.saveSettings();
 					}),
 			);
