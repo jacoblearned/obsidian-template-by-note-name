@@ -9,7 +9,15 @@ import {
 	normalizePath,
 	moment,
 } from "obsidian";
-import Matcher from "./matcher";
+
+/**
+ * A Matcher represents a single user-provided templating rule as specified in the settings tab.
+ */
+export interface Matcher {
+	matchString: string;
+	templatePath: string;
+	matchMethod: string;
+}
 
 /**
  * TemplateByNoteNameSettings represents the user-provided settings for the plugin.
@@ -66,9 +74,39 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	 * @returns The first Matcher whose rule matches the file, or undefined if no match is found
 	 */
 	findMatcherForFile(file: TFile): Matcher | undefined {
-		return this.settings.matchers.find((matcher) =>
-			matcher.matches(file.basename, this.settings.caseSensitive),
+		return this.settings.matchers.find((match) =>
+			this.fileMatchesRule(file.basename, match),
 		);
+	}
+
+	/**
+	 * Determine if the given basename matches the provided matcher rule.
+	 * @param basename
+	 * @param matcher
+	 * @returns Whether the basename matches the matcher rule
+	 */
+	fileMatchesRule(basename: string, matcher: Matcher): boolean {
+		if (matcher.matchString.trim() === "") {
+			return false;
+		}
+
+		basename = this.settings.caseSensitive
+			? basename
+			: basename.toLowerCase();
+		const matchString = this.settings.caseSensitive
+			? matcher.matchString
+			: matcher.matchString.toLowerCase();
+
+		switch (matcher.matchMethod) {
+			case "prefix":
+				return basename.startsWith(matchString);
+			case "suffix":
+				return basename.endsWith(matchString);
+			case "contains":
+				return basename.includes(matchString);
+			default:
+				return false;
+		}
 	}
 
 	/**
@@ -179,7 +217,7 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 			oldName is the full path to the note from the vault root, e.g. "Path/To/Note.md"
 			*/
 			const oldBaseName = oldName.split("/").pop()?.slice(0, -3) ?? "";
-			if (matcher.matches(oldBaseName, this.settings.caseSensitive)) {
+			if (this.fileMatchesRule(oldBaseName, matcher)) {
 				return;
 			}
 
@@ -264,7 +302,6 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-misused-promises
 	async onunload() {
-		this.settings.matchers = [];
 		await this.saveSettings();
 	}
 }
@@ -357,9 +394,11 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 					.setClass("template-by-note-name-add-matcher-button")
 					.setIcon("plus")
 					.onClick(async () => {
-						this.plugin.settings.matchers.push(
-							new Matcher("", "", "prefix"),
-						);
+						this.plugin.settings.matchers.push({
+							matchString: "",
+							templatePath: "",
+							matchMethod: "prefix",
+						});
 						await this.plugin.saveSettings();
 						this.display();
 					}),
@@ -368,7 +407,11 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		// Ensure we always display at least one empty matcher
 		// if user deletes attempts to delete all of them
 		if (this.plugin.settings.matchers.length === 0) {
-			this.plugin.settings.matchers.push(new Matcher("", "", "prefix"));
+			this.plugin.settings.matchers.push({
+				matchString: "",
+				templatePath: "",
+				matchMethod: "prefix",
+			});
 		}
 
 		this.plugin.settings.matchers.forEach((matcher, index) => {
