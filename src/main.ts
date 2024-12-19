@@ -32,9 +32,6 @@ export interface TemplateByNoteNameSettings {
 	/** Whether to apply a template to a note when it is renamed to match a rule */
 	timeFormat: string;
 
-	/** Whether to apply a template to a note when it is renamed to match a rule */
-	templateOnRename: boolean;
-
 	/** Whether to match note names against user-provided rule match strings in a case-sensitive manner */
 	caseSensitive: boolean;
 
@@ -46,7 +43,6 @@ const DEFAULT_SETTINGS: TemplateByNoteNameSettings = {
 	templateFolder: "Templates",
 	dateFormat: "YYYY-MM-DD",
 	timeFormat: "HH:mm",
-	templateOnRename: true,
 	caseSensitive: true,
 	matchers: [],
 };
@@ -197,43 +193,6 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 	}
 
 	/**
-	 * Apply a template to a renamed note if the new name matches a user-provided rule.
-	 * @param file The Obsidian file object representing the renamed note
-	 * @param oldName The full path to the note from the vault root before it was renamed
-	 */
-	async templateOnRename(file: TFile, oldName: string) {
-		const matcher = this.findMatcherForFile(file);
-
-		if (matcher) {
-			const templatePath = matcher.templatePath;
-			if (!this.settings.templateOnRename) {
-				return;
-			}
-
-			/* We only want to prepend the template content if the note was renamed to match a rule
-			and the oldName does not match the rule the note now matches.
-			This prevents the template content from being prepended multiple times on subsequent renames.
-
-			oldName is the full path to the note from the vault root, e.g. "Path/To/Note.md"
-			*/
-			const oldBaseName = oldName.split("/").pop()?.slice(0, -3) ?? "";
-			if (this.fileMatchesRule(oldBaseName, matcher)) {
-				return;
-			}
-
-			const templateContent = await this.getTemplateContent(templatePath);
-			const fileContent = await this.app.vault.read(file);
-
-			if (this.settings.templateOnRename) {
-				await this.writeToFile(
-					file,
-					`${templateContent}\n\n${fileContent}`,
-				);
-			}
-		}
-	}
-
-	/**
 	 * Load the plugin's user-provided settings and register event listeners.
 	 */
 	async onload() {
@@ -244,14 +203,6 @@ export default class TemplateByNoteNamePlugin extends Plugin {
 				this.app.vault.on("create", async (file) => {
 					if (file instanceof TFile) {
 						await this.templateOnCreate(file);
-					}
-				}),
-			);
-
-			this.registerEvent(
-				this.app.vault.on("rename", async (file, oldName) => {
-					if (file instanceof TFile) {
-						await this.templateOnRename(file, oldName);
 					}
 				}),
 			);
@@ -492,20 +443,6 @@ class TemplateByNoteNameSettingTab extends PluginSettingTab {
 		});
 
 		new Setting(containerEl).setName("Advanced").setHeading();
-
-		new Setting(containerEl)
-			.setName("Template on rename")
-			.setDesc(
-				"When an existing note's name is changed to one that matches a rule, the plugin will prepend the rule's template to the note's content.",
-			)
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.templateOnRename)
-					.onChange(async (value) => {
-						this.plugin.settings.templateOnRename = value;
-						await this.plugin.saveSettings();
-					}),
-			);
 
 		new Setting(containerEl)
 			.setName("Case-Sensitive matching")
