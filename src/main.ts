@@ -46,7 +46,7 @@ const DEFAULT_SETTINGS: TemplateByNoteNameSettings = {
 	templateFolder: "Templates",
 	dateFormat: "YYYY-MM-DD",
 	timeFormat: "HH:mm",
-	templateOnRename: true,
+	templateOnRename: false,
 	caseSensitive: true,
 	matchers: [],
 };
