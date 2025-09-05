@@ -24,22 +24,22 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@eslint/js": "^9.33.0",
+		"@eslint/js": "^9.34.0",
 		"@rollup/plugin-commonjs": "^28.0.6",
 		"@rollup/plugin-node-resolve": "^16.0.1",
 		"@rollup/plugin-typescript": "^12.1.4",
 		"@types/node": "^24.3.0",
-		"@typescript-eslint/eslint-plugin": "8.39.1",
-		"@typescript-eslint/parser": "8.39.1",
+		"@typescript-eslint/eslint-plugin": "8.41.0",
+		"@typescript-eslint/parser": "8.41.0",
 		"builtin-modules": "5.0.0",
-		"eslint": "^9.33.0",
+		"eslint": "^9.34.0",
 		"obsidian": "latest",
 		"prettier": "^3.6.2",
-		"rollup": "^4.46.2",
+		"rollup": "^4.50.0",
 		"rollup-plugin-copy": "^3.5.0",
 		"tslib": "2.8.1",
-		"typedoc": "^0.28.10",
+		"typedoc": "^0.28.12",
 		"typescript": "^5.9.2",
-		"typescript-eslint": "^8.39.1"
+		"typescript-eslint": "^8.41.0"
 	}
 }
